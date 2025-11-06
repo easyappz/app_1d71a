@@ -42,13 +42,10 @@ COPY . .
 
 # Install and build React
 WORKDIR /app/react
-COPY react/package.json react/package-lock.json* ./
-COPY react/ .
+RUN npm install
 RUN npm run build
-WORKDIR /app
 
-# Move React build to the target directory
-RUN mv /app/react/build /app/react_build
+WORKDIR /app
 
 # Collect static files
 RUN python manage.py collectstatic --noinput
