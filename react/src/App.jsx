@@ -8,6 +8,7 @@ import { Home } from './components/Home';
 import { LoginPage } from './components/Auth/LoginPage';
 import { RegisterPage } from './components/Auth/RegisterPage';
 import { Layout } from './components/Layout/Layout';
+import FeedPage from './components/Feed/FeedPage';
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -60,7 +61,7 @@ function AppContent() {
   useEffect(() => {
     if (typeof window !== 'undefined' && typeof window.handleRoutes === 'function') {
       /** Нужно передавать список существующих роутов */
-      window.handleRoutes(['/', '/login', '/register', '/friends', '/messages', '/search', '/profile']);
+      window.handleRoutes(['/', '/login', '/register', '/friends', '/messages', '/search', '/profile', '/feed']);
     }
   }, []);
 
@@ -80,7 +81,14 @@ function AppContent() {
         <Route path="/" element={
           <PrivateRoute>
             <Layout>
-              <Home />
+              <FeedPage />
+            </Layout>
+          </PrivateRoute>
+        } />
+        <Route path="/feed" element={
+          <PrivateRoute>
+            <Layout>
+              <FeedPage />
             </Layout>
           </PrivateRoute>
         } />
