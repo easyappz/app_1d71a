@@ -45,6 +45,25 @@ class MemberLoginSerializer(serializers.Serializer):
     password = serializers.CharField(required=True, write_only=True, style={'input_type': 'password'})
 
 
+class MemberUpdateSerializer(serializers.ModelSerializer):
+    """Serializer for updating user profile"""
+    class Meta:
+        model = Member
+        fields = ['first_name', 'last_name', 'avatar', 'bio']
+        extra_kwargs = {
+            'first_name': {'max_length': 150, 'required': False},
+            'last_name': {'max_length': 150, 'required': False},
+            'avatar': {'required': False, 'allow_null': True},
+            'bio': {'required': False},
+        }
+
+
+class TokenSerializer(serializers.Serializer):
+    """Serializer for token response"""
+    token = serializers.CharField()
+    user = MemberSerializer()
+
+
 class PostCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating posts"""
     class Meta:
