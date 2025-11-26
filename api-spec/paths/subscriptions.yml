@@ -1,0 +1,253 @@
+/api/users/{id}/subscribe:
+  post:
+    summary: Subscribe to user
+    description: Subscribe to a user to follow their updates
+    tags:
+      - Subscriptions
+    x-isSecure: true
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: ID of the user to subscribe to
+    responses:
+      '201':
+        description: Successfully subscribed
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                subscription:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    subscriber_id:
+                      type: integer
+                    subscribed_to_id:
+                      type: integer
+                    created_at:
+                      type: string
+                      format: date-time
+      '400':
+        description: Already subscribed or cannot subscribe to yourself
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+      '404':
+        description: User not found
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+      '401':
+        description: Not authenticated
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+  delete:
+    summary: Unsubscribe from user
+    description: Unsubscribe from a user
+    tags:
+      - Subscriptions
+    x-isSecure: true
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: ID of the user to unsubscribe from
+    responses:
+      '200':
+        description: Successfully unsubscribed
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+      '404':
+        description: Subscription not found
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+      '401':
+        description: Not authenticated
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+
+/api/users/{id}/subscribers:
+  get:
+    summary: Get user subscribers
+    description: Retrieve list of users who are subscribed to this user
+    tags:
+      - Subscriptions
+    x-isSecure: true
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: User ID
+      - name: page
+        in: query
+        schema:
+          type: integer
+          default: 1
+      - name: page_size
+        in: query
+        schema:
+          type: integer
+          default: 20
+    responses:
+      '200':
+        description: List of subscribers
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                count:
+                  type: integer
+                next:
+                  type: string
+                  nullable: true
+                previous:
+                  type: string
+                  nullable: true
+                results:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      username:
+                        type: string
+                      email:
+                        type: string
+                      first_name:
+                        type: string
+                      last_name:
+                        type: string
+                      avatar:
+                        type: string
+                        nullable: true
+                      bio:
+                        type: string
+                      is_online:
+                        type: boolean
+                      last_seen:
+                        type: string
+                        format: date-time
+                        nullable: true
+                      created_at:
+                        type: string
+                        format: date-time
+      '404':
+        description: User not found
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+      '401':
+        description: Not authenticated
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+
+/api/users/{id}/subscriptions:
+  get:
+    summary: Get user subscriptions
+    description: Retrieve list of users this user is subscribed to
+    tags:
+      - Subscriptions
+    x-isSecure: true
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: User ID
+      - name: page
+        in: query
+        schema:
+          type: integer
+          default: 1
+      - name: page_size
+        in: query
+        schema:
+          type: integer
+          default: 20
+    responses:
+      '200':
+        description: List of subscriptions
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                count:
+                  type: integer
+                next:
+                  type: string
+                  nullable: true
+                previous:
+                  type: string
+                  nullable: true
+                results:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      username:
+                        type: string
+                      email:
+                        type: string
+                      first_name:
+                        type: string
+                      last_name:
+                        type: string
+                      avatar:
+                        type: string
+                        nullable: true
+                      bio:
+                        type: string
+                      is_online:
+                        type: boolean
+                      last_seen:
+                        type: string
+                        format: date-time
+                        nullable: true
+                      created_at:
+                        type: string
+                        format: date-time
+      '404':
+        description: User not found
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+      '401':
+        description: Not authenticated
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
