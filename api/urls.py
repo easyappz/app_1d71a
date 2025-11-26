@@ -8,6 +8,12 @@ from api.views import (
     UserListView,
     UserDetailView,
     UserSearchView,
+    PostListCreateView,
+    PostDetailView,
+    UserPostsView,
+    LikeView,
+    CommentListCreateView,
+    CommentDeleteView,
 )
 
 urlpatterns = [
@@ -23,4 +29,14 @@ urlpatterns = [
     path("users", UserListView.as_view(), name="user-list"),
     path("users/search", UserSearchView.as_view(), name="user-search"),
     path("users/<int:id>", UserDetailView.as_view(), name="user-detail"),
+    path("users/<int:id>/posts", UserPostsView.as_view(), name="user-posts"),
+    
+    # Post endpoints
+    path("posts", PostListCreateView.as_view(), name="post-list-create"),
+    path("posts/<int:id>", PostDetailView.as_view(), name="post-detail"),
+    path("posts/<int:id>/like", LikeView.as_view(), name="post-like"),
+    path("posts/<int:id>/comments", CommentListCreateView.as_view(), name="post-comments"),
+    
+    # Comment endpoints
+    path("comments/<int:id>", CommentDeleteView.as_view(), name="comment-delete"),
 ]
