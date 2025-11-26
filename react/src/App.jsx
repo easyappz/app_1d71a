@@ -14,6 +14,7 @@ import SettingsPage from './components/Settings/SettingsPage';
 import MessagesPage from './components/Messages/MessagesPage';
 import SearchPage from './components/Search/SearchPage';
 import FriendsPage from './components/Friends/FriendsPage';
+import NotFoundPage from './components/NotFound/NotFoundPage';
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -66,87 +67,86 @@ function AppContent() {
   useEffect(() => {
     if (typeof window !== 'undefined' && typeof window.handleRoutes === 'function') {
       /** Нужно передавать список существующих роутов */
-      window.handleRoutes(['/', '/login', '/register', '/friends', '/messages', '/messages/:userId', '/search', '/profile', '/feed', '/profile/:id', '/settings']);
+      window.handleRoutes([
+        '/',
+        '/login',
+        '/register',
+        '/profile/:id',
+        '/settings',
+        '/friends',
+        '/messages',
+        '/messages/:userId',
+        '/search'
+      ]);
     }
   }, []);
 
   return (
     <ErrorBoundary>
-      <Routes>
-        <Route path="/login" element={
-          <PublicRoute>
-            <LoginPage />
-          </PublicRoute>
-        } />
-        <Route path="/register" element={
-          <PublicRoute>
-            <RegisterPage />
-          </PublicRoute>
-        } />
-        <Route path="/" element={
-          <PrivateRoute>
-            <Layout>
-              <FeedPage />
-            </Layout>
-          </PrivateRoute>
-        } />
-        <Route path="/feed" element={
-          <PrivateRoute>
-            <Layout>
-              <FeedPage />
-            </Layout>
-          </PrivateRoute>
-        } />
-        <Route path="/profile/:id" element={
-          <PrivateRoute>
-            <Layout>
-              <ProfilePage />
-            </Layout>
-          </PrivateRoute>
-        } />
-        <Route path="/profile" element={
-          <PrivateRoute>
-            <Layout>
-              <ProfilePage />
-            </Layout>
-          </PrivateRoute>
-        } />
-        <Route path="/settings" element={
-          <PrivateRoute>
-            <Layout>
-              <SettingsPage />
-            </Layout>
-          </PrivateRoute>
-        } />
-        <Route path="/friends" element={
-          <PrivateRoute>
-            <Layout>
-              <FriendsPage />
-            </Layout>
-          </PrivateRoute>
-        } />
-        <Route path="/messages" element={
-          <PrivateRoute>
-            <Layout>
-              <MessagesPage />
-            </Layout>
-          </PrivateRoute>
-        } />
-        <Route path="/messages/:userId" element={
-          <PrivateRoute>
-            <Layout>
-              <MessagesPage />
-            </Layout>
-          </PrivateRoute>
-        } />
-        <Route path="/search" element={
-          <PrivateRoute>
-            <Layout>
-              <SearchPage />
-            </Layout>
-          </PrivateRoute>
-        } />
-      </Routes>
+      <div data-easytag="id1-react/src/App.jsx">
+        <Routes>
+          <Route path="/login" element={
+            <PublicRoute>
+              <LoginPage />
+            </PublicRoute>
+          } />
+          <Route path="/register" element={
+            <PublicRoute>
+              <RegisterPage />
+            </PublicRoute>
+          } />
+          <Route path="/" element={
+            <PrivateRoute>
+              <Layout>
+                <FeedPage />
+              </Layout>
+            </PrivateRoute>
+          } />
+          <Route path="/profile/:id" element={
+            <PrivateRoute>
+              <Layout>
+                <ProfilePage />
+              </Layout>
+            </PrivateRoute>
+          } />
+          <Route path="/settings" element={
+            <PrivateRoute>
+              <Layout>
+                <SettingsPage />
+              </Layout>
+            </PrivateRoute>
+          } />
+          <Route path="/friends" element={
+            <PrivateRoute>
+              <Layout>
+                <FriendsPage />
+              </Layout>
+            </PrivateRoute>
+          } />
+          <Route path="/messages" element={
+            <PrivateRoute>
+              <Layout>
+                <MessagesPage />
+              </Layout>
+            </PrivateRoute>
+          } />
+          <Route path="/messages/:userId" element={
+            <PrivateRoute>
+              <Layout>
+                <MessagesPage />
+              </Layout>
+            </PrivateRoute>
+          } />
+          <Route path="/search" element={
+            <PrivateRoute>
+              <Layout>
+                <SearchPage />
+              </Layout>
+            </PrivateRoute>
+          } />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </div>
     </ErrorBoundary>
   );
 }
