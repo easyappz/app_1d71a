@@ -11,6 +11,9 @@ import { Layout } from './components/Layout/Layout';
 import FeedPage from './components/Feed/FeedPage';
 import ProfilePage from './components/Profile/ProfilePage';
 import SettingsPage from './components/Settings/SettingsPage';
+import MessagesPage from './components/Messages/MessagesPage';
+import SearchPage from './components/Search/SearchPage';
+import FriendsPage from './components/Friends/FriendsPage';
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -63,7 +66,7 @@ function AppContent() {
   useEffect(() => {
     if (typeof window !== 'undefined' && typeof window.handleRoutes === 'function') {
       /** Нужно передавать список существующих роутов */
-      window.handleRoutes(['/', '/login', '/register', '/friends', '/messages', '/search', '/profile', '/feed', '/profile/:id', '/settings']);
+      window.handleRoutes(['/', '/login', '/register', '/friends', '/messages', '/messages/:userId', '/search', '/profile', '/feed', '/profile/:id', '/settings']);
     }
   }, []);
 
@@ -118,21 +121,28 @@ function AppContent() {
         <Route path="/friends" element={
           <PrivateRoute>
             <Layout>
-              <div>Страница Друзья (в разработке)</div>
+              <FriendsPage />
             </Layout>
           </PrivateRoute>
         } />
         <Route path="/messages" element={
           <PrivateRoute>
             <Layout>
-              <div>Страница Сообщения (в разработке)</div>
+              <MessagesPage />
+            </Layout>
+          </PrivateRoute>
+        } />
+        <Route path="/messages/:userId" element={
+          <PrivateRoute>
+            <Layout>
+              <MessagesPage />
             </Layout>
           </PrivateRoute>
         } />
         <Route path="/search" element={
           <PrivateRoute>
             <Layout>
-              <div>Страница Поиск (в разработке)</div>
+              <SearchPage />
             </Layout>
           </PrivateRoute>
         } />

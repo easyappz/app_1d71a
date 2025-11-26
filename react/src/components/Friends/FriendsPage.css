@@ -1,0 +1,214 @@
+.friends-page {
+  min-height: calc(100vh - 80px);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 30px 20px;
+}
+
+.friends-container {
+  max-width: 900px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.friends-header {
+  padding: 30px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.friends-header h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.friends-tabs {
+  display: flex;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.friends-tab {
+  flex: 1;
+  padding: 20px;
+  background: white;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  color: #666;
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s;
+  position: relative;
+}
+
+.friends-tab:hover {
+  background: #f8f9fa;
+}
+
+.friends-tab.active {
+  color: #667eea;
+}
+
+.friends-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.friends-content {
+  padding: 20px;
+}
+
+.friends-user-item {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  border-radius: 15px;
+  margin-bottom: 10px;
+  transition: background 0.2s;
+}
+
+.friends-user-item:hover {
+  background: #f8f9fa;
+}
+
+.friends-user-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 24px;
+  margin-right: 15px;
+  position: relative;
+}
+
+.friends-online-indicator {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 14px;
+  height: 14px;
+  background: #4caf50;
+  border: 2px solid white;
+  border-radius: 50%;
+}
+
+.friends-user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.friends-user-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 3px;
+}
+
+.friends-user-username {
+  font-size: 14px;
+  color: #999;
+  margin-bottom: 5px;
+}
+
+.friends-user-bio {
+  font-size: 14px;
+  color: #666;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.friends-user-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.friends-unsubscribe-button,
+.friends-message-button,
+.friends-subscribe-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.friends-unsubscribe-button {
+  background: #e0e0e0;
+  color: #666;
+}
+
+.friends-subscribe-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.friends-message-button {
+  background: white;
+  color: #667eea;
+  border: 2px solid #667eea;
+}
+
+.friends-unsubscribe-button:hover:not(:disabled),
+.friends-message-button:hover:not(:disabled),
+.friends-subscribe-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.friends-unsubscribe-button:disabled,
+.friends-message-button:disabled,
+.friends-subscribe-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.friends-loading,
+.friends-error,
+.friends-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #999;
+}
+
+.friends-error {
+  color: #f44336;
+}
+
+@media (max-width: 768px) {
+  .friends-page {
+    padding: 20px 15px;
+  }
+
+  .friends-header {
+    padding: 20px;
+  }
+
+  .friends-header h1 {
+    font-size: 24px;
+  }
+
+  .friends-user-actions {
+    flex-direction: column;
+  }
+
+  .friends-unsubscribe-button,
+  .friends-message-button,
+  .friends-subscribe-button {
+    width: 100%;
+  }
+}
