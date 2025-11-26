@@ -129,6 +129,16 @@ class MessageSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'sender', 'receiver', 'is_read', 'created_at']
 
 
+class MessageCreateSerializer(serializers.ModelSerializer):
+    """Serializer for creating messages"""
+    class Meta:
+        model = Message
+        fields = ['content']
+        extra_kwargs = {
+            'content': {'min_length': 1, 'max_length': 5000},
+        }
+
+
 class DialogSerializer(serializers.Serializer):
     """Serializer for dialog list"""
     id = serializers.IntegerField()

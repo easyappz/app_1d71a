@@ -4,10 +4,10 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.pagination import PageNumberPagination
 from django.utils import timezone
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Max, Prefetch, Subquery, OuterRef
 from drf_spectacular.utils import extend_schema
 
-from api.models import Member, Post, Like, Comment
+from api.models import Member, Post, Like, Comment, Subscription, Message
 from api.tokens import Token
 from api.authentication import TokenAuthentication
 from api.serializers import (
@@ -16,10 +16,14 @@ from api.serializers import (
     MemberLoginSerializer,
     MemberUpdateSerializer,
     MessageSerializer,
+    MessageCreateSerializer,
     PostSerializer,
     PostCreateSerializer,
     CommentSerializer,
     CommentCreateSerializer,
+    SubscriptionSerializer,
+    DialogSerializer,
+    MemberShortSerializer,
 )
 
 
@@ -503,6 +507,298 @@ class CommentDeleteView(APIView):
             )
 
         comment.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class SubscribeView(APIView):
+    """
+    Subscribe or unsubscribe from user.
+    """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        responses={201: dict, 400: dict, 404: dict, 401: dict},
+        description="Subscribe to a user"
+    )
+    def post(self, request, id):
+        try:
+            target_user = Member.objects.get(id=id)
+        except Member.DoesNotExist:
+            return Response(
+                {"error": "Not found", "detail": "User not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Check if trying to subscribe to self
+        if request.user.id == target_user.id:
+            return Response(
+                {"error": "Invalid operation", "detail": "Cannot subscribe to yourself"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Check if already subscribed
+        if Subscription.objects.filter(subscriber=request.user, target=target_user).exists():
+            return Response(
+                {"error": "Already subscribed", "detail": "You are already subscribed to this user"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        subscription = Subscription.objects.create(subscriber=request.user, target=target_user)
+        serializer = SubscriptionSerializer(subscription)
+
+        return Response(
+            {
+                "message": "Successfully subscribed",
+                "subscription": serializer.data
+            },
+            status=status.HTTP_201_CREATED
+        )
+
+    @extend_schema(
+        responses={200: dict, 404: dict, 401: dict},
+        description="Unsubscribe from a user"
+    )
+    def delete(self, request, id):
+        try:
+            target_user = Member.objects.get(id=id)
+        except Member.DoesNotExist:
+            return Response(
+                {"error": "Not found", "detail": "User not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        try:
+            subscription = Subscription.objects.get(subscriber=request.user, target=target_user)
+        except Subscription.DoesNotExist:
+            return Response(
+                {"error": "Not found", "detail": "Subscription not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        subscription.delete()
+
+        return Response(
+            {"message": "Successfully unsubscribed"},
+            status=status.HTTP_200_OK
+        )
+
+
+class SubscribersListView(APIView):
+    """
+    Get list of user subscribers.
+    """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    pagination_class = StandardResultsSetPagination
+
+    @extend_schema(
+        responses={200: MemberSerializer(many=True), 404: dict, 401: dict},
+        description="Retrieve paginated list of user subscribers"
+    )
+    def get(self, request, id):
+        try:
+            user = Member.objects.get(id=id)
+        except Member.DoesNotExist:
+            return Response(
+                {"error": "Not found", "detail": "User not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Get subscribers (users who subscribed to this user)
+        subscriber_ids = Subscription.objects.filter(target=user).values_list('subscriber', flat=True)
+        queryset = Member.objects.filter(id__in=subscriber_ids).order_by('-created_at')
+
+        paginator = self.pagination_class()
+        paginated_queryset = paginator.paginate_queryset(queryset, request)
+        serializer = MemberSerializer(paginated_queryset, many=True)
+        return paginator.get_paginated_response(serializer.data)
+
+
+class SubscriptionsListView(APIView):
+    """
+    Get list of user subscriptions.
+    """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    pagination_class = StandardResultsSetPagination
+
+    @extend_schema(
+        responses={200: MemberSerializer(many=True), 404: dict, 401: dict},
+        description="Retrieve paginated list of user subscriptions"
+    )
+    def get(self, request, id):
+        try:
+            user = Member.objects.get(id=id)
+        except Member.DoesNotExist:
+            return Response(
+                {"error": "Not found", "detail": "User not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Get subscriptions (users this user is subscribed to)
+        subscription_ids = Subscription.objects.filter(subscriber=user).values_list('target', flat=True)
+        queryset = Member.objects.filter(id__in=subscription_ids).order_by('-created_at')
+
+        paginator = self.pagination_class()
+        paginated_queryset = paginator.paginate_queryset(queryset, request)
+        serializer = MemberSerializer(paginated_queryset, many=True)
+        return paginator.get_paginated_response(serializer.data)
+
+
+class DialogListView(APIView):
+    """
+    Get list of dialogs.
+    """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    pagination_class = StandardResultsSetPagination
+
+    @extend_schema(
+        responses={200: DialogSerializer(many=True), 401: dict},
+        description="Retrieve paginated list of dialogs with last message and unread count"
+    )
+    def get(self, request):
+        user = request.user
+
+        # Get all users with whom current user has messages
+        participants_sent = Message.objects.filter(sender=user).values_list('receiver', flat=True).distinct()
+        participants_received = Message.objects.filter(receiver=user).values_list('sender', flat=True).distinct()
+        participant_ids = set(list(participants_sent) + list(participants_received))
+
+        dialogs = []
+        for participant_id in participant_ids:
+            participant = Member.objects.get(id=participant_id)
+            
+            # Get last message
+            last_message = Message.objects.filter(
+                Q(sender=user, receiver=participant) | Q(sender=participant, receiver=user)
+            ).order_by('-created_at').first()
+            
+            # Count unread messages from this participant
+            unread_count = Message.objects.filter(
+                sender=participant,
+                receiver=user,
+                is_read=False
+            ).count()
+            
+            dialogs.append({
+                'id': participant.id,
+                'participant': participant,
+                'last_message': last_message,
+                'unread_count': unread_count,
+                'last_message_time': last_message.created_at if last_message else None
+            })
+        
+        # Sort by last message time
+        dialogs.sort(key=lambda x: x['last_message_time'] if x['last_message_time'] else timezone.datetime.min.replace(tzinfo=timezone.utc), reverse=True)
+        
+        # Prepare for pagination
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(dialogs, request)
+        
+        # Serialize
+        serialized_dialogs = []
+        for dialog in page:
+            serialized_dialogs.append({
+                'id': dialog['id'],
+                'participant': MemberShortSerializer(dialog['participant']).data,
+                'last_message': MessageSerializer(dialog['last_message']).data if dialog['last_message'] else None,
+                'unread_count': dialog['unread_count']
+            })
+        
+        return paginator.get_paginated_response(serialized_dialogs)
+
+
+class DialogMessagesView(APIView):
+    """
+    Get messages from dialog or send new message.
+    """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    pagination_class = StandardResultsSetPagination
+
+    @extend_schema(
+        responses={200: MessageSerializer(many=True), 404: dict, 401: dict},
+        description="Retrieve paginated list of messages from dialog with specific user"
+    )
+    def get(self, request, user_id):
+        try:
+            other_user = Member.objects.get(id=user_id)
+        except Member.DoesNotExist:
+            return Response(
+                {"error": "Not found", "detail": "User not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Get messages between users
+        queryset = Message.objects.filter(
+            Q(sender=request.user, receiver=other_user) | Q(sender=other_user, receiver=request.user)
+        ).order_by('-created_at')
+
+        # Mark incoming messages as read
+        Message.objects.filter(
+            sender=other_user,
+            receiver=request.user,
+            is_read=False
+        ).update(is_read=True)
+
+        paginator = self.pagination_class()
+        paginator.page_size = 50  # Override page size for messages
+        paginated_queryset = paginator.paginate_queryset(queryset, request)
+        serializer = MessageSerializer(paginated_queryset, many=True)
+        return paginator.get_paginated_response(serializer.data)
+
+    @extend_schema(
+        request=MessageCreateSerializer,
+        responses={201: MessageSerializer, 400: dict, 404: dict, 401: dict},
+        description="Send a message to specific user"
+    )
+    def post(self, request, user_id):
+        try:
+            receiver = Member.objects.get(id=user_id)
+        except Member.DoesNotExist:
+            return Response(
+                {"error": "Not found", "detail": "User not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = MessageCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            message = serializer.save(sender=request.user, receiver=receiver)
+            response_serializer = MessageSerializer(message)
+            return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class MessageDeleteView(APIView):
+    """
+    Delete specific message.
+    """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        responses={204: None, 403: dict, 404: dict, 401: dict},
+        description="Delete specific message by ID"
+    )
+    def delete(self, request, id):
+        try:
+            message = Message.objects.get(id=id)
+        except Message.DoesNotExist:
+            return Response(
+                {"error": "Not found", "detail": "Message not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Check if user is the sender
+        if request.user.id != message.sender.id:
+            return Response(
+                {"error": "Permission denied", "detail": "You can only delete your own messages"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        message.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

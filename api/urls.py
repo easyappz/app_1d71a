@@ -14,6 +14,12 @@ from api.views import (
     LikeView,
     CommentListCreateView,
     CommentDeleteView,
+    SubscribeView,
+    SubscribersListView,
+    SubscriptionsListView,
+    DialogListView,
+    DialogMessagesView,
+    MessageDeleteView,
 )
 
 urlpatterns = [
@@ -31,6 +37,11 @@ urlpatterns = [
     path("users/<int:id>", UserDetailView.as_view(), name="user-detail"),
     path("users/<int:id>/posts", UserPostsView.as_view(), name="user-posts"),
     
+    # Subscription endpoints
+    path("users/<int:id>/subscribe", SubscribeView.as_view(), name="user-subscribe"),
+    path("users/<int:id>/subscribers", SubscribersListView.as_view(), name="user-subscribers"),
+    path("users/<int:id>/subscriptions", SubscriptionsListView.as_view(), name="user-subscriptions"),
+    
     # Post endpoints
     path("posts", PostListCreateView.as_view(), name="post-list-create"),
     path("posts/<int:id>", PostDetailView.as_view(), name="post-detail"),
@@ -39,4 +50,9 @@ urlpatterns = [
     
     # Comment endpoints
     path("comments/<int:id>", CommentDeleteView.as_view(), name="comment-delete"),
+    
+    # Dialog and message endpoints
+    path("dialogs", DialogListView.as_view(), name="dialog-list"),
+    path("dialogs/<int:user_id>", DialogMessagesView.as_view(), name="dialog-messages"),
+    path("messages/<int:id>", MessageDeleteView.as_view(), name="message-delete"),
 ]
