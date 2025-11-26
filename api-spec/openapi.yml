@@ -17,6 +17,8 @@ paths:
     $ref: './paths/auth.yml#/~1api~1auth~1logout'
   /api/auth/me:
     $ref: './paths/auth.yml#/~1api~1auth~1me'
+  /api/auth/change-password:
+    $ref: './paths/password.yml#/~1api~1auth~1change-password'
   /api/users:
     $ref: './paths/users.yml#/~1api~1users'
   /api/users/{id}:

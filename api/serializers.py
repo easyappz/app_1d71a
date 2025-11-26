@@ -58,6 +58,12 @@ class MemberUpdateSerializer(serializers.ModelSerializer):
         }
 
 
+class ChangePasswordSerializer(serializers.Serializer):
+    """Serializer for changing password"""
+    old_password = serializers.CharField(required=True, write_only=True)
+    new_password = serializers.CharField(required=True, write_only=True, min_length=8)
+
+
 class TokenSerializer(serializers.Serializer):
     """Serializer for token response"""
     token = serializers.CharField()

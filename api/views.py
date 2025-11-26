@@ -24,6 +24,7 @@ from api.serializers import (
     SubscriptionSerializer,
     DialogSerializer,
     MemberShortSerializer,
+    ChangePasswordSerializer,
 )
 
 
@@ -139,6 +140,38 @@ class MeView(APIView):
     def get(self, request):
         serializer = MemberSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ChangePasswordView(APIView):
+    """
+    Change user password.
+    """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        request=ChangePasswordSerializer,
+        responses={200: dict, 400: dict, 401: dict},
+        description="Change password for authenticated user"
+    )
+    def post(self, request):
+        serializer = ChangePasswordSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        old_password = serializer.validated_data['old_password']
+        new_password = serializer.validated_data['new_password']
+
+        if not request.user.check_password(old_password):
+            return Response(
+                {"error": "Invalid password", "detail": "Old password is incorrect"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        request.user.set_password(new_password)
+        request.user.save()
+
+        return Response({"message": "Password successfully changed"}, status=status.HTTP_200_OK)
 
 
 class UserListView(APIView):
