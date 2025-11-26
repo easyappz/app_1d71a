@@ -23,6 +23,18 @@ paths:
     $ref: './paths/users.yml#/~1api~1users~1{id}'
   /api/users/search:
     $ref: './paths/users.yml#/~1api~1users~1search'
+  /api/users/{id}/posts:
+    $ref: './paths/posts.yml#/~1api~1users~1{id}~1posts'
+  /api/posts:
+    $ref: './paths/posts.yml#/~1api~1posts'
+  /api/posts/{id}:
+    $ref: './paths/posts.yml#/~1api~1posts~1{id}'
+  /api/posts/{id}/like:
+    $ref: './paths/likes.yml#/~1api~1posts~1{id}~1like'
+  /api/posts/{id}/comments:
+    $ref: './paths/comments.yml#/~1api~1posts~1{id}~1comments'
+  /api/comments/{id}:
+    $ref: './paths/comments.yml#/~1api~1comments~1{id}'
 
 components:
   securitySchemes:
