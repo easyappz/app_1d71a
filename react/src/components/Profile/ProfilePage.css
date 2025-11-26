@@ -1,0 +1,122 @@
+.profile-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.profile-loading,
+.profile-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  color: white;
+  text-align: center;
+  padding: 40px;
+  margin: 20px;
+}
+
+.loading-spinner {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.profile-error h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+.profile-content {
+  margin-top: 30px;
+}
+
+.posts-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #333;
+  text-align: center;
+}
+
+.posts-loading,
+.no-posts {
+  text-align: center;
+  padding: 60px 20px;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  border-radius: 16px;
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.no-posts p {
+  margin: 0;
+  font-size: 20px;
+}
+
+.profile-posts {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.load-more-btn {
+  display: block;
+  margin: 30px auto;
+  padding: 14px 40px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 30px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.load-more-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.load-more-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  padding: 12px 30px;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(245, 87, 108, 0.6);
+}
+
+@media (max-width: 768px) {
+  .profile-page {
+    padding: 15px;
+  }
+
+  .posts-title {
+    font-size: 20px;
+  }
+
+  .profile-loading,
+  .profile-error {
+    padding: 30px 20px;
+  }
+}

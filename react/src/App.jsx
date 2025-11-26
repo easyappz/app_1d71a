@@ -9,6 +9,8 @@ import { LoginPage } from './components/Auth/LoginPage';
 import { RegisterPage } from './components/Auth/RegisterPage';
 import { Layout } from './components/Layout/Layout';
 import FeedPage from './components/Feed/FeedPage';
+import ProfilePage from './components/Profile/ProfilePage';
+import SettingsPage from './components/Settings/SettingsPage';
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -61,7 +63,7 @@ function AppContent() {
   useEffect(() => {
     if (typeof window !== 'undefined' && typeof window.handleRoutes === 'function') {
       /** Нужно передавать список существующих роутов */
-      window.handleRoutes(['/', '/login', '/register', '/friends', '/messages', '/search', '/profile', '/feed']);
+      window.handleRoutes(['/', '/login', '/register', '/friends', '/messages', '/search', '/profile', '/feed', '/profile/:id', '/settings']);
     }
   }, []);
 
@@ -92,6 +94,27 @@ function AppContent() {
             </Layout>
           </PrivateRoute>
         } />
+        <Route path="/profile/:id" element={
+          <PrivateRoute>
+            <Layout>
+              <ProfilePage />
+            </Layout>
+          </PrivateRoute>
+        } />
+        <Route path="/profile" element={
+          <PrivateRoute>
+            <Layout>
+              <ProfilePage />
+            </Layout>
+          </PrivateRoute>
+        } />
+        <Route path="/settings" element={
+          <PrivateRoute>
+            <Layout>
+              <SettingsPage />
+            </Layout>
+          </PrivateRoute>
+        } />
         <Route path="/friends" element={
           <PrivateRoute>
             <Layout>
@@ -110,13 +133,6 @@ function AppContent() {
           <PrivateRoute>
             <Layout>
               <div>Страница Поиск (в разработке)</div>
-            </Layout>
-          </PrivateRoute>
-        } />
-        <Route path="/profile" element={
-          <PrivateRoute>
-            <Layout>
-              <div>Страница Профиль (в разработке)</div>
             </Layout>
           </PrivateRoute>
         } />

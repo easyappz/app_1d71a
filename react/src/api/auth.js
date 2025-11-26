@@ -3,7 +3,7 @@ import instance from './axiosInterceptor';
 /**
  * Register a new user
  * @param {Object} data - Registration data
- * @param {string} data.username - Username (3-150 characters)
+ * @param {string} data.username - Username (min 3, max 150 characters)
  * @param {string} data.email - Email address
  * @param {string} data.password - Password (min 8 characters)
  * @param {string} data.first_name - First name (max 150 characters)
@@ -24,19 +24,15 @@ export const register = async (data) => {
  */
 export const login = async (credentials) => {
   const response = await instance.post('/api/auth/login', credentials);
-  if (response.data.token) {
-    localStorage.setItem('authToken', response.data.token);
-  }
   return response.data;
 };
 
 /**
  * Logout user
- * @returns {Promise} Logout message
+ * @returns {Promise} Logout confirmation
  */
 export const logout = async () => {
   const response = await instance.post('/api/auth/logout');
-  localStorage.removeItem('authToken');
   return response.data;
 };
 
@@ -46,5 +42,17 @@ export const logout = async () => {
  */
 export const getMe = async () => {
   const response = await instance.get('/api/auth/me');
+  return response.data;
+};
+
+/**
+ * Change user password
+ * @param {Object} data - Password change data
+ * @param {string} data.old_password - Current password
+ * @param {string} data.new_password - New password (min 8 characters)
+ * @returns {Promise} Success confirmation
+ */
+export const changePassword = async (data) => {
+  const response = await instance.post('/api/auth/change-password', data);
   return response.data;
 };
