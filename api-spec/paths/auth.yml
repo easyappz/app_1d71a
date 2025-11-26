@@ -1,0 +1,204 @@
+/api/auth/register:
+  post:
+    summary: Register a new user
+    description: Create a new user account
+    tags:
+      - Authentication
+    x-isSecure: false
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - username
+              - email
+              - password
+              - first_name
+              - last_name
+            properties:
+              username:
+                type: string
+                minLength: 3
+                maxLength: 150
+              email:
+                type: string
+                format: email
+              password:
+                type: string
+                minLength: 8
+              first_name:
+                type: string
+                maxLength: 150
+              last_name:
+                type: string
+                maxLength: 150
+    responses:
+      '201':
+        description: User successfully registered
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                username:
+                  type: string
+                email:
+                  type: string
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                avatar:
+                  type: string
+                  nullable: true
+                bio:
+                  type: string
+                is_online:
+                  type: boolean
+                last_seen:
+                  type: string
+                  format: date-time
+                  nullable: true
+                created_at:
+                  type: string
+                  format: date-time
+      '400':
+        description: Validation error
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+
+/api/auth/login:
+  post:
+    summary: Login user
+    description: Authenticate user and create session
+    tags:
+      - Authentication
+    x-isSecure: false
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - username
+              - password
+            properties:
+              username:
+                type: string
+              password:
+                type: string
+    responses:
+      '200':
+        description: Successfully authenticated
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                username:
+                  type: string
+                email:
+                  type: string
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                avatar:
+                  type: string
+                  nullable: true
+                bio:
+                  type: string
+                is_online:
+                  type: boolean
+                last_seen:
+                  type: string
+                  format: date-time
+                  nullable: true
+                created_at:
+                  type: string
+                  format: date-time
+      '401':
+        description: Invalid credentials
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+
+/api/auth/logout:
+  post:
+    summary: Logout user
+    description: Terminate user session
+    tags:
+      - Authentication
+    x-isSecure: true
+    responses:
+      '200':
+        description: Successfully logged out
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+      '401':
+        description: Not authenticated
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+
+/api/auth/me:
+  get:
+    summary: Get current user
+    description: Retrieve currently authenticated user information
+    tags:
+      - Authentication
+    x-isSecure: true
+    responses:
+      '200':
+        description: Current user data
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                username:
+                  type: string
+                email:
+                  type: string
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                avatar:
+                  type: string
+                  nullable: true
+                bio:
+                  type: string
+                is_online:
+                  type: boolean
+                last_seen:
+                  type: string
+                  format: date-time
+                  nullable: true
+                created_at:
+                  type: string
+                  format: date-time
+      '401':
+        description: Not authenticated
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'

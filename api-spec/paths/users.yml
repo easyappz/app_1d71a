@@ -1,0 +1,295 @@
+/api/users:
+  get:
+    summary: Get list of users
+    description: Retrieve paginated list of all users
+    tags:
+      - Users
+    x-isSecure: true
+    parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          default: 1
+      - name: page_size
+        in: query
+        schema:
+          type: integer
+          default: 20
+    responses:
+      '200':
+        description: List of users
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                count:
+                  type: integer
+                next:
+                  type: string
+                  nullable: true
+                previous:
+                  type: string
+                  nullable: true
+                results:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      username:
+                        type: string
+                      email:
+                        type: string
+                      first_name:
+                        type: string
+                      last_name:
+                        type: string
+                      avatar:
+                        type: string
+                        nullable: true
+                      bio:
+                        type: string
+                      is_online:
+                        type: boolean
+                      last_seen:
+                        type: string
+                        format: date-time
+                        nullable: true
+                      created_at:
+                        type: string
+                        format: date-time
+      '401':
+        description: Not authenticated
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+
+/api/users/{id}:
+  get:
+    summary: Get user profile
+    description: Retrieve specific user profile by ID
+    tags:
+      - Users
+    x-isSecure: true
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      '200':
+        description: User profile data
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                username:
+                  type: string
+                email:
+                  type: string
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                avatar:
+                  type: string
+                  nullable: true
+                bio:
+                  type: string
+                is_online:
+                  type: boolean
+                last_seen:
+                  type: string
+                  format: date-time
+                  nullable: true
+                created_at:
+                  type: string
+                  format: date-time
+      '404':
+        description: User not found
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+      '401':
+        description: Not authenticated
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+  patch:
+    summary: Update user profile
+    description: Update specific user profile fields
+    tags:
+      - Users
+    x-isSecure: true
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              first_name:
+                type: string
+                maxLength: 150
+              last_name:
+                type: string
+                maxLength: 150
+              avatar:
+                type: string
+                nullable: true
+              bio:
+                type: string
+    responses:
+      '200':
+        description: User profile updated
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                username:
+                  type: string
+                email:
+                  type: string
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                avatar:
+                  type: string
+                  nullable: true
+                bio:
+                  type: string
+                is_online:
+                  type: boolean
+                last_seen:
+                  type: string
+                  format: date-time
+                  nullable: true
+                created_at:
+                  type: string
+                  format: date-time
+      '400':
+        description: Validation error
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+      '403':
+        description: Permission denied
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+      '404':
+        description: User not found
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+      '401':
+        description: Not authenticated
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+
+/api/users/search:
+  get:
+    summary: Search users
+    description: Search users by username, first name, or last name
+    tags:
+      - Users
+    x-isSecure: true
+    parameters:
+      - name: q
+        in: query
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: page
+        in: query
+        schema:
+          type: integer
+          default: 1
+      - name: page_size
+        in: query
+        schema:
+          type: integer
+          default: 20
+    responses:
+      '200':
+        description: Search results
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                count:
+                  type: integer
+                next:
+                  type: string
+                  nullable: true
+                previous:
+                  type: string
+                  nullable: true
+                results:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      username:
+                        type: string
+                      email:
+                        type: string
+                      first_name:
+                        type: string
+                      last_name:
+                        type: string
+                      avatar:
+                        type: string
+                        nullable: true
+                      bio:
+                        type: string
+                      is_online:
+                        type: boolean
+                      last_seen:
+                        type: string
+                        format: date-time
+                        nullable: true
+                      created_at:
+                        type: string
+                        format: date-time
+      '400':
+        description: Invalid search query
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'
+      '401':
+        description: Not authenticated
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yml#/components/schemas/Error'

@@ -1,0 +1,40 @@
+openapi: 3.0.3
+info:
+  title: Social Network API
+  version: 1.0.0
+  description: API for social networking application
+
+servers:
+  - url: http://localhost:8000
+    description: Development server
+
+paths:
+  /api/auth/register:
+    $ref: './paths/auth.yml#/~1api~1auth~1register'
+  /api/auth/login:
+    $ref: './paths/auth.yml#/~1api~1auth~1login'
+  /api/auth/logout:
+    $ref: './paths/auth.yml#/~1api~1auth~1logout'
+  /api/auth/me:
+    $ref: './paths/auth.yml#/~1api~1auth~1me'
+  /api/users:
+    $ref: './paths/users.yml#/~1api~1users'
+  /api/users/{id}:
+    $ref: './paths/users.yml#/~1api~1users~1{id}'
+  /api/users/search:
+    $ref: './paths/users.yml#/~1api~1users~1search'
+
+components:
+  securitySchemes:
+    sessionAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        detail:
+          type: string
